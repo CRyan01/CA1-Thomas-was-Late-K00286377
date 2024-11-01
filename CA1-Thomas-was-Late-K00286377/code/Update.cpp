@@ -33,22 +33,43 @@ void Engine::update(float dtAsSeconds)
 		// when thomas is touching the home tile
 		if (detectCollisions(m_Thomas))
 		{
-			// New level required
-			m_NewLevelRequired = true;
+			// Store the score for the current level
+			int currentLevel = m_LM.getCurrentLevel() - 1;
+			m_LevelScores[currentLevel] = m_LM.getScore();
 
-			// Play the reach goal sound
-			m_SM.playReachGoal();
+			if (m_LM.getCurrentLevel() == 3) {
+				// Display the scoreboard
+				displayScoreboard();
+				m_Playing = false;
+			} else {
+				// New level required
+				m_NewLevelRequired = true;
 
+				// Play the reach goal sound
+				m_SM.playReachGoal();
+			}
 		}
 
-		// Count down the time the player has left
-		m_TimeRemaining -= dtAsSeconds;
-
-		// Have Thomas and Bob run out of time?
-		if (m_TimeRemaining <= 0)
-		{
-			m_NewLevelRequired = true;
+		// Update the chaser enemies
+		for (auto& enemy : m_ChaserEnemies) {
+			enemy.update(dtAsSeconds, m_Thomas);
 		}
+
+		// Update the patroller enemies
+		for (auto& enemy : m_PatrollerEnemies) {
+			enemy.update(dtAsSeconds, m_Thomas);
+		}
+
+		// Update the jumping enemies
+		for (auto& enemy : m_JumpingEnemies) {
+			enemy.update(dtAsSeconds, m_Thomas);
+		}
+
+		// Apply any active effects
+		m_Thomas.updateEffects(dtAsSeconds);
+
+		// Update the timer
+		m_ElapsedTime += dtAsSeconds;
 
 	}// End if playing
 
@@ -74,25 +95,8 @@ void Engine::update(float dtAsSeconds)
 			m_SM.playFire(Vector2f(posX, posY), m_Thomas.getCenter());
 		}
 	}
-		
-	// Set the appropriate view around the appropriate character
-	if (m_SplitScreen)
-	{
-		m_LeftView.setCenter(m_Thomas.getCenter());
-		m_RightView.setCenter(m_Bob.getCenter());
-	}
-	else
-	{
-		// Centre full screen around appropriate character
-		if (m_Character1)
-		{
-			m_MainView.setCenter(m_Thomas.getCenter());
-		}
-		else
-		{
-			m_MainView.setCenter(m_Bob.getCenter());
-		}
-	}
+	// Centre full screen around character
+	m_MainView.setCenter(m_Thomas.getCenter());
 
 	// Time to update the HUD?
 	// Increment the number of frames since the last HUD calculation
@@ -101,17 +105,31 @@ void Engine::update(float dtAsSeconds)
 	// Update the HUD every m_TargetFramesPerHUDUpdate frames
 	if (m_FramesSinceLastHUDUpdate > m_TargetFramesPerHUDUpdate)
 	{
+
+		// Update the score
+		calculateScore();
+
 		// Update game HUD text
 		stringstream ssTime;
 		stringstream ssLevel;
+		stringstream ssCoins;
+		stringstream ssScore;
 
 		// Update the time text
-		ssTime << (int)m_TimeRemaining;
+		ssTime << "Time:" << (int)m_ElapsedTime;
 		m_Hud.setTime(ssTime.str());
 
 		// Update the level text
 		ssLevel << "Level:" << m_LM.getCurrentLevel();
 		m_Hud.setLevel(ssLevel.str());
+
+		// Update the score text
+		ssScore << "Score:" << m_LM.getScore();
+		m_Hud.setScore(ssScore.str());
+
+		// Update the coins text
+		ssCoins << "Coins:" << m_LM.getCoinsCollected();
+		m_Hud.setCoins(ssCoins.str());
 
 		m_FramesSinceLastHUDUpdate = 0;
 	}
@@ -122,3 +140,27 @@ void Engine::update(float dtAsSeconds)
 		m_PS.update(dtAsSeconds);
 	}
 }// End of update function
+
+// Calculate the players score based on coins collected
+void Engine::calculateScore()
+{
+	// 100 extra points per coin
+	int score = m_LM.getCoinsCollected() * 100;
+
+	// Update the total score
+	m_LM.setScore(score);
+}
+
+// Display score from each level
+void Engine::displayScoreboard()
+{
+	// Create a string with the scores
+	std::stringstream ss;
+	ss << "Level Scores:\n";
+	for (int i = 0; i < m_LevelScores.size(); ++i) {
+		ss << "Level " << (i + 1) << ": " << m_LevelScores[i] << "\n";
+	}
+
+	// Display summary in text object
+	m_Hud.setScoreboard(ss.str());
+}

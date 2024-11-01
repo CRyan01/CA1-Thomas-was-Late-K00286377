@@ -7,6 +7,13 @@
 #include "SoundManager.h"
 #include "HUD.h"
 #include "ParticleSystem.h"
+#include "ChaserEnemy.h"
+#include "PatrollerEnemy.h"
+#include "JumpingEnemy.h"
+#include "Item.h"
+#include "Key.h"
+#include "SpeedBoost.h"
+#include "Coin.h"
 
 using namespace sf;
 
@@ -32,7 +39,7 @@ private:
 	// The Hud
 	Hud m_Hud;
 	int m_FramesSinceLastHUDUpdate = 0;
-	int m_TargetFramesPerHUDUpdate = 500;
+	int m_TargetFramesPerHUDUpdate = 140;
 
 	const int TILE_SIZE = 50;
 	const int VERTS_IN_QUAD = 4;
@@ -70,8 +77,7 @@ private:
 	// Start in full screen mode
 	bool m_SplitScreen = false;
 
-	// How much time is left in the current level
-	float m_TimeRemaining = 10;
+	// Game time total
 	Time m_GameTimeTotal;
 
 	// Is it time for a new/first level?
@@ -86,6 +92,33 @@ private:
 
 	// Texture for the background and the level tiles
 	Texture m_TextureTiles;
+
+	// Vectors to store enemies of each type
+	vector<ChaserEnemy> m_ChaserEnemies;
+	vector<PatrollerEnemy> m_PatrollerEnemies;
+	vector<JumpingEnemy> m_JumpingEnemies;
+
+	// Vectors to store enemies of each type
+	vector<Key> m_Keys;
+	vector<SpeedBoost> m_SpeedBoosts;
+	vector<Coin> m_Coins;
+
+	// A vector of scores the player acheieved for each level
+	vector<int> m_LevelScores;
+
+	// Params for enemy types
+	float chaserEnemySpeed = 100.0f;
+	float patrollerEnemySpeed = 100.0f;
+	float jumpingEnemySpeed = 100.0f;
+	float patrolDistance = 100.0f;
+	float jumpCooldown = 4.0f;
+	float jumpSpeed = 200.0f;
+
+	// Track time passed in level
+	float m_ElapsedTime;
+
+	// Calculate the players score based on time elapsed & coins collected
+	void calculateScore();
 	
 	// Private functions for internal use only
 	void input();
@@ -94,6 +127,9 @@ private:
 
 	// Load a new level
 	void loadLevel();
+
+	// Display the scores for each level
+	void displayScoreboard();
 
 	// Run will call all the private functions
 	bool detectCollisions(PlayableCharacter& character);
@@ -111,5 +147,4 @@ public:
 
 	// Run will call all the private functions
 	void run();
-
 };

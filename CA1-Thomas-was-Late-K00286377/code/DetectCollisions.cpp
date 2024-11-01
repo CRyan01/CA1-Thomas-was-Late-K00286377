@@ -91,6 +91,62 @@ bool Engine::detectCollisions(PlayableCharacter& character)
 					character.stopJump();
 				}
 			}
+
+			// Enemy collision check
+			for (const auto& enemy : m_ChaserEnemies) {
+				if (character.getPosition().intersects(enemy.getSprite().getGlobalBounds())) {
+					if (!character.isInvincible()) {
+						character.spawn(m_LM.getStartPosition(), GRAVITY);
+						m_SM.playFallInFire();
+						return reachedGoal;
+					}
+				}
+			}
+
+			for (const auto& enemy : m_PatrollerEnemies) {
+				if (character.getPosition().intersects(enemy.getSprite().getGlobalBounds())) {
+					if (!character.isInvincible()) {
+						character.spawn(m_LM.getStartPosition(), GRAVITY);
+						m_SM.playFallInFire();
+						return reachedGoal;
+					}
+				}
+			}
+
+			for (const auto& enemy : m_JumpingEnemies) {
+				if (character.getPosition().intersects(enemy.getSprite().getGlobalBounds())) {
+					if (!character.isInvincible()) {
+						character.spawn(m_LM.getStartPosition(), GRAVITY);
+						m_SM.playFallInFire();
+						return reachedGoal;
+					}
+				}
+			}
+
+			// Key collision detection
+			for (auto& key : m_Keys) {
+				if (key.checkCollision(character.getPosition())) {
+					character.collectKey();
+				}
+			}
+
+			// Speed boost collision detection
+			for (auto& speedBoost : m_SpeedBoosts) {
+				if (speedBoost.checkCollision(character.getPosition())) {
+					character.activateSpeedBoost();
+				}
+			}
+
+			// Coin collision detection
+			for (auto& coin : m_Coins) {
+				if (coin.checkCollision(character.getPosition())) {
+					character.collectCoin();
+
+					// Update the number of coins collected
+					int currentCoins = m_LM.getCoinsCollected();
+					m_LM.setCoinsCollected(currentCoins + 1);
+				}
+			}
 			
 			// More collision detection here once we have learned about particle effects
 			// Has the characters' feet touched fire or water?
@@ -109,9 +165,12 @@ bool Engine::detectCollisions(PlayableCharacter& character)
 				}
 			}
 
-			// Has the character reached the goal?
-			if (m_ArrayLevel[y][x] == 4)
+			// Check if the character reached the exit with the key item
+			if (m_ArrayLevel[y][x] == 4 && character.hasKey())
 			{
+				// Reset hasKey for the next level
+				character.removeKey();
+
 				// Character has reached the goal
 				reachedGoal = true;
 			}

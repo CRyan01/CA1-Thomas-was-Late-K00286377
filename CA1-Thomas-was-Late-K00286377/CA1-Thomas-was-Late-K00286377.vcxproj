@@ -21,29 +21,37 @@
   <ItemGroup>
     <ClInclude Include="code\Bob.h" />
     <ClInclude Include="code\ChaserEnemy.h" />
+    <ClInclude Include="code\Coin.h" />
     <ClInclude Include="code\Enemy.h" />
     <ClInclude Include="code\Engine.h" />
     <ClInclude Include="code\HUD.h" />
+    <ClInclude Include="code\Item.h" />
     <ClInclude Include="code\JumpingEnemy.h" />
+    <ClInclude Include="code\Key.h" />
     <ClInclude Include="code\LevelManager.h" />
     <ClInclude Include="code\NonPlayableCharacter.h" />
     <ClInclude Include="code\Particle.h" />
     <ClInclude Include="code\ParticleSystem.h" />
     <ClInclude Include="code\PatrollerEnemy.h" />
+    <ClInclude Include="code\PlayableCharacter.h" />
     <ClInclude Include="code\SoundManager.h" />
+    <ClInclude Include="code\SpeedBoost.h" />
     <ClInclude Include="code\TextureHolder.h" />
     <ClInclude Include="code\Thomas.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\Bob.cpp" />
     <ClCompile Include="code\ChaserEnemy.cpp" />
+    <ClCompile Include="code\Coin.cpp" />
     <ClCompile Include="code\DetectCollisions.cpp" />
     <ClCompile Include="code\Draw.cpp" />
     <ClCompile Include="code\Enemy.cpp" />
     <ClCompile Include="code\Engine.cpp" />
     <ClCompile Include="code\HUD.cpp" />
     <ClCompile Include="code\Input.cpp" />
+    <ClCompile Include="code\Item.cpp" />
     <ClCompile Include="code\Jumping Enemy.cpp" />
+    <ClCompile Include="code\Key.cpp" />
     <ClCompile Include="code\LevelManager.cpp" />
     <ClCompile Include="code\LoadLevel.cpp" />
     <ClCompile Include="code\Main.cpp" />
@@ -54,6 +62,7 @@
     <ClCompile Include="code\PlayableCharacter.cpp" />
     <ClCompile Include="code\PopulateEmitters.cpp" />
     <ClCompile Include="code\SoundManager.cpp" />
+    <ClCompile Include="code\SpeedBoost.cpp" />
     <ClCompile Include="code\TextureHolder.cpp" />
     <ClCompile Include="code\Thomas.cpp" />
     <ClCompile Include="code\Update.cpp" />

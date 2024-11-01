@@ -26,6 +26,12 @@ protected:
 	// Has the player just initialted a jump
 	bool m_JustJumped = false;
 
+	// How long the player has left in invincibility mode
+	float m_InvincibilityTimer = 0.0f;
+
+	// How long invincibility mode lasts
+	const float INVINCIBILITY_DURATION = 1.0f;
+
 	// Private variables and functions come next
 private:
 	// What is the gravity
@@ -46,6 +52,21 @@ private:
 	// And a texture
 	Texture m_Texture;
 
+	// Does the thomas have the key
+	bool m_HasKey = false;
+
+	// Speed boost effect
+	float m_SpeedBoostTimer = 0.0f;
+	float m_SpeedMultiplier = 1.0f;
+
+	// Score multiplier effect
+	int m_ScoreMultiplier = 1;
+	float m_ScoreMultiplierTimer = 0.0f;
+
+	// If the speed boost is active
+	bool m_isSpeedBoostActive = false;
+	bool m_isScoreMultiplierActive = false;
+
 	// All our public functions will come next
 public:
 
@@ -54,6 +75,9 @@ public:
 	// This is a pure virtual function
 	bool virtual handleInput() = 0;
 	// This class is now abstract and cannot be instanciated
+
+	// Returns true if the player is invincible
+	bool isInvincible() const;
 
 	// Where is the player
 	FloatRect getPosition();
@@ -74,8 +98,22 @@ public:
 	void stopJump();
 
 	// Where is the center of the character
-	Vector2f getCenter();
+	Vector2f getCenter() const;
 
 	// We will call this function once every frame
 	void update(float elapsedTime);
+
+	// Collection functions
+	void collectKey();
+	void activateSpeedBoost();
+	void collectCoin();
+
+	// Update active effects
+	void updateEffects(float dtAsSeconds);
+
+	// Check if player has collected the key
+	bool hasKey() const;
+
+	// Reset the hasKey flag
+	void removeKey();
 };

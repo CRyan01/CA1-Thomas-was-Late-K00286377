@@ -13,6 +13,16 @@ int** LevelManager::nextLevel(VertexArray& rVaLevel)
 	m_LevelSize.x = 0;
 	m_LevelSize.y = 0;
 
+	// Clear enemy positions from previous levels
+	m_ChaserEnemiesPositions.clear();
+	m_PatrollerEnemiesPositions.clear();
+	m_JumpingEnemiesPositions.clear();
+
+	// Clear item positions from previous levels
+	m_KeyPositions.clear();
+	m_SpeedBoostPositions.clear();
+	m_CoinPositions.clear();
+
 	// Get the next level
 	m_CurrentLevel++;
 	if (m_CurrentLevel > NUM_LEVELS)
@@ -27,22 +37,22 @@ int** LevelManager::nextLevel(VertexArray& rVaLevel)
 	{
 	case 1:
 		levelToLoad = "levels/level1.txt";
-		m_StartPosition.x = 100;
-		m_StartPosition.y = 100;
+		m_StartPosition.x = 50;
+		m_StartPosition.y = 800;
 		m_BaseTimeLimit = 30.0f;
 		break;
 
 	case 2:
 		levelToLoad = "levels/level2.txt";
-		m_StartPosition.x = 100;
-		m_StartPosition.y = 3600;
+		m_StartPosition.x = 50;
+		m_StartPosition.y = 800;
 		m_BaseTimeLimit = 100.0f;
 		break;
 
 	case 3:
 		levelToLoad = "levels/level3.txt";
-		m_StartPosition.x = 1250;
-		m_StartPosition.y = 0;
+		m_StartPosition.x = 50;
+		m_StartPosition.y = 800; 
 		m_BaseTimeLimit = 30.0f;
 		break;
 	}
@@ -80,8 +90,29 @@ int** LevelManager::nextLevel(VertexArray& rVaLevel)
 
 			const char val = row[x];
 			arrayLevel[y][x] = atoi(&val);
-		}
 
+			// Populate the level with enemies & items based on placement in text file
+			int tileType = getTileType(row[x]);
+			if (tileType == 5) {
+				m_ChaserEnemiesPositions.push_back(Vector2f(x * TILE_SIZE, y * TILE_SIZE));
+				arrayLevel[y][x] = 0;
+			} else if (tileType == 6) {
+				m_PatrollerEnemiesPositions.push_back(Vector2f(x * TILE_SIZE, y * TILE_SIZE));
+				arrayLevel[y][x] = 0;
+			} else if (tileType == 7) {
+				m_JumpingEnemiesPositions.push_back(Vector2f(x * TILE_SIZE, y * TILE_SIZE));
+				arrayLevel[y][x] = 0;
+			} else if (tileType == 8) {
+				m_KeyPositions.push_back(Vector2f(x * TILE_SIZE, y * TILE_SIZE));
+				arrayLevel[y][x] = 0;
+			} else if (tileType == 9) {
+				m_SpeedBoostPositions.push_back(Vector2f(x * TILE_SIZE, y * TILE_SIZE));
+				arrayLevel[y][x] = 0;
+			} else if (tileType == 10) {
+				m_CoinPositions.push_back(Vector2f(x * TILE_SIZE, y * TILE_SIZE));
+				arrayLevel[y][x] = 0;
+			}
+		}
 		y++;
 	}
 
@@ -147,6 +178,38 @@ int LevelManager::getCurrentLevel()
 	return m_CurrentLevel;
 }
 
+// Returns positions of chaser enemies
+const vector<Vector2f> LevelManager::getChaserEnemiesPositions()
+{
+	return m_ChaserEnemiesPositions;
+}
+// Returns positions patroller of chaser enemies
+const vector<Vector2f> LevelManager::getPatrollerEnemiesPositions()
+{
+	return m_PatrollerEnemiesPositions;
+}
+// Returns positions jumping of chaser enemies
+const vector<Vector2f> LevelManager::getJumpingEnemiesPositions()
+{
+	return m_JumpingEnemiesPositions;
+}
+
+// Returns positions of chaser enemies
+const vector<Vector2f> LevelManager::getKeyPositions()
+{
+	return m_KeyPositions;
+}
+// Returns positions patroller of chaser enemies
+const vector<Vector2f> LevelManager::getSpeedBoostPositions()
+{
+	return m_SpeedBoostPositions;
+}
+// Returns positions jumping of chaser enemies
+const vector<Vector2f> LevelManager::getCoinPositions()
+{
+	return m_CoinPositions;
+}
+
 float LevelManager::getTimeLimit()
 {
 	return m_BaseTimeLimit * m_TimeModifier;
@@ -155,4 +218,35 @@ float LevelManager::getTimeLimit()
 Vector2f LevelManager::getStartPosition()
 {
 	return m_StartPosition;
+}
+
+// Returns the current score
+int LevelManager::getScore() {
+	return  m_Score;
+}
+
+// Sets the current score
+void LevelManager::setScore(int score) {
+	m_Score = score;
+}
+
+// Returns the amount of coins collected
+int LevelManager::getCoinsCollected() {
+	return m_CoinsCollected;
+}
+
+// Sets the amount of coins collected
+void LevelManager::setCoinsCollected(int coins) {
+	m_CoinsCollected = coins;
+}
+
+int LevelManager::getTileType(char tile) {
+	switch (tile) {
+	case '5': return 5;  // Chaser Enemy
+	case '6': return 6;  // Patroller Enemy
+	case '7': return 7;  // Jumping Enemy
+	case '8': return 8;  // Key
+	case '9': return 9;  // Speed Boost
+	case 'C': return 10; // Coin
+	}
 }

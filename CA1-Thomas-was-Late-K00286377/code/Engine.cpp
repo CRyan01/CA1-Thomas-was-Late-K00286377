@@ -36,6 +36,8 @@ Engine::Engine()
 	// Associate the sprite with the texture
 	m_BackgroundSprite.setTexture(m_BackgroundTexture);
 
+	// Init level scores with 3 levels
+	m_LevelScores.resize(3, 0);
 
 	// Load the texture for the background vertex array
 	m_TextureTiles = TextureHolder::GetTexture(

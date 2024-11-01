@@ -12,19 +12,21 @@ void PlayableCharacter::spawn(Vector2f startPosition, float gravity)
 	// Move the sprite in to position
 	m_Sprite.setPosition(m_Position);
 
+	m_InvincibilityTimer = INVINCIBILITY_DURATION;
 }
 
 void PlayableCharacter::update(float elapsedTime)
 {
+	float actualSpeed = m_Speed * m_SpeedMultiplier;
 
 	if (m_RightPressed)
 	{
-		m_Position.x += m_Speed * elapsedTime;
+			m_Position.x += actualSpeed * elapsedTime;
 	}
 
 	if (m_LeftPressed)
 	{
-		m_Position.x -= m_Speed * elapsedTime;
+			m_Position.x -= actualSpeed * elapsedTime;
 	}
 
 
@@ -85,6 +87,13 @@ void PlayableCharacter::update(float elapsedTime)
 	// Move the sprite into position
 	m_Sprite.setPosition(m_Position);
 
+	// Update invincibility timer
+	if (m_InvincibilityTimer > 0.0f) {
+		m_InvincibilityTimer -= elapsedTime;
+		if (m_InvincibilityTimer < 0.0f) {
+			m_InvincibilityTimer = 0.0f;
+		}
+	}
 }
 
 FloatRect PlayableCharacter::getPosition()
@@ -92,7 +101,7 @@ FloatRect PlayableCharacter::getPosition()
 	return m_Sprite.getGlobalBounds();
 }
 
-Vector2f PlayableCharacter::getCenter()
+Vector2f PlayableCharacter::getCenter() const
 {
 	return Vector2f(
 		m_Position.x + m_Sprite.getGlobalBounds().width / 2,
@@ -154,5 +163,49 @@ void PlayableCharacter::stopJump()
 	m_IsFalling = true;
 }
 
+bool PlayableCharacter::isInvincible() const {
+	return m_InvincibilityTimer > 0.0f;
+}
 
+void PlayableCharacter::collectKey() {
+	m_HasKey = true;
+}
 
+void PlayableCharacter::activateSpeedBoost() {
+	m_SpeedBoostTimer = 5.0f;  // duration
+	m_SpeedMultiplier = 2.0f;  // 2x speed
+}
+
+void PlayableCharacter::collectCoin() {
+	m_ScoreMultiplier = 2;         // multiply the score by 2
+	m_ScoreMultiplierTimer = 10.0f; // duration
+}
+
+void PlayableCharacter::updateEffects(float dtAsSeconds) {
+	// Update the speed boost effect
+	if (m_SpeedBoostTimer > 0) {
+		m_SpeedBoostTimer -= dtAsSeconds;
+		if (m_SpeedBoostTimer <= 0) {
+			m_SpeedMultiplier = 1.0f;  // Reset speed
+			m_isSpeedBoostActive = false; // Mark speed boost as inactive
+		}
+	}
+
+	// Update the score multiplier effect
+	if (m_ScoreMultiplierTimer > 0) {
+		m_ScoreMultiplierTimer -= dtAsSeconds;
+		if (m_ScoreMultiplierTimer <= 0) {
+			m_ScoreMultiplier = 1;  // Reset to score multiplier
+			m_isScoreMultiplierActive = false;
+		}
+	}
+}
+
+bool PlayableCharacter::hasKey() const {
+	return m_HasKey;
+}
+
+// Reset the hasKey flag
+void PlayableCharacter::removeKey() {
+	m_HasKey = false;
+}
